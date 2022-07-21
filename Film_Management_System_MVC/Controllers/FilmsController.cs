@@ -5,17 +5,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Film_Management_System_API;
 using Film_Management_System_API.Models;
+using AutoMapper;
 
 namespace Film_Management_System_MVC.Controllers
 {
     public class FilmsController : Controller
     {
         private readonly MoviesContext _context;
-
+        private readonly IMapper mapper;
         public FilmsController(MoviesContext context)
         {
             _context = context;
+            
         }
 
         // GET: Films
@@ -46,6 +49,21 @@ namespace Film_Management_System_MVC.Controllers
 
             return View(film);
         }
+        [HttpGet]
+        public async Task<IActionResult> SearchByName(string name)
+        {
+            var query = from f in _context.Films
+                        where Convert.ToString(f.Title).Equals(name)
+                        select new
+                        {
+                            f.Title,
+                            f.ReleaseYear,
+                            f.Rating
+
+                        };
+            return Ok(query);
+        }
+        
 
         // GET: Films/Create
         public IActionResult Create()

@@ -27,6 +27,7 @@ namespace Film_Management_System_API.Controller
             this.mapper = mapper;
         }
 
+     
 
         // GET: api/Films
 
@@ -65,11 +66,13 @@ namespace Film_Management_System_API.Controller
         [HttpGet("movieid")]
         public IActionResult GetFilmByName(string movieid)
         {
-
-           
             var query = from f in _context.Films
                         where Convert.ToString(f.Title).Equals(movieid)
-                        select f;
+                        select new { f.Title,
+                        f.ReleaseYear,
+                        f.Rating
+
+            };
             return Ok(query);
         }
         [HttpGet("rate")]
@@ -100,7 +103,6 @@ namespace Film_Management_System_API.Controller
         [HttpGet("Language")]
         public IActionResult GetFilmByLanguage(string Language)
         {
-
 
             var query = from f in _context.Films
                         join n in _context.Languages on f.LanguageId equals n.LanguageId

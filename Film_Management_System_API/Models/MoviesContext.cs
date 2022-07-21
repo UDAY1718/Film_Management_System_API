@@ -17,13 +17,19 @@ namespace Film_Management_System_API.Models
         }
 
         public virtual DbSet<Actor> Actors { get; set; } = null!;
+        public virtual DbSet<Admin> Admins { get; set; } = null!;
         public virtual DbSet<Category> Categories { get; set; } = null!;
+        public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Film> Films { get; set; } = null!;
         public virtual DbSet<Language> Languages { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-           
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Data Source=LAPTOP-IGR1158J\\SQLEXPRESS;Initial Catalog=Movies;Integrated Security=True;");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +52,27 @@ namespace Film_Management_System_API.Models
                     .HasColumnName("Last_Name");
             });
 
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.ToTable("Admin");
+
+                entity.Property(e => e.AdminId)
+                    .HasMaxLength(50)
+                    .HasColumnName("Admin_Id");
+
+                entity.Property(e => e.AdminEmail)
+                    .HasMaxLength(50)
+                    .HasColumnName("Admin_Email");
+
+                entity.Property(e => e.AdminPassword)
+                    .HasMaxLength(50)
+                    .HasColumnName("Admin_Password");
+
+                entity.Property(e => e.AdminUsername)
+                    .HasMaxLength(50)
+                    .HasColumnName("Admin_Username");
+            });
+
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.ToTable("CATEGORY");
@@ -56,6 +83,31 @@ namespace Film_Management_System_API.Models
                     .HasColumnName("Category_id");
 
                 entity.Property(e => e.Name).HasColumnType("text");
+            });
+
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.ToTable("Customer");
+
+                entity.Property(e => e.CustomerId)
+                    .HasMaxLength(50)
+                    .HasColumnName("Customer_Id");
+
+                entity.Property(e => e.CustEmail)
+                    .HasMaxLength(20)
+                    .HasColumnName("Cust_Email");
+
+                entity.Property(e => e.CustMobileNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("Cust_MobileNo");
+
+                entity.Property(e => e.CustName)
+                    .HasMaxLength(50)
+                    .HasColumnName("Cust_Name");
+
+                entity.Property(e => e.CustPassword)
+                    .HasMaxLength(50)
+                    .HasColumnName("Cust_Password");
             });
 
             modelBuilder.Entity<Film>(entity =>

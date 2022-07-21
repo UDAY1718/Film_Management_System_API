@@ -1,0 +1,47 @@
+﻿@model Film_Management_System_API.Models.Film
+
+@{
+    ViewData["Title"] = "SearchByName";
+}
+
+
+
+    <h2>Index</h2>  
+  
+    <p>  
+        @Html.ActionLink("Create New", "Create")  
+    </p>  
+    <p>  
+        @using (Html.BeginForm("Index", "Home", FormMethod.Get))  
+        {  
+            <b> Search by</b> @Html.RadioButton("searchby", "Name", true)<b> Name</b>  
+            @Html.RadioButton("searchby", "Gender") <b> Gender</b><br />  
+            @Html.TextBox("search") <input type="submit" value=" Search" />  
+        }  
+    </p>  
+  
+    <dl class="row">
+
+     
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rating)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rating)
+        </dd>
+   
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ReleaseYear)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ReleaseYear)
+        </dd>
+   
+        
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.FilmId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
