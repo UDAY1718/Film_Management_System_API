@@ -9,7 +9,7 @@ using Film_Management_System_API.Models;
 using Film_Management_System_API.Infrastructure;
 using Film_Management_System_API.DataModels;
 using AutoMapper;
-using Film_Management_System_API.FilmDAO;
+
 
 namespace Film_Management_System_API.Controller
 {
@@ -40,7 +40,7 @@ namespace Film_Management_System_API.Controller
             return await _context.Films.ToListAsync();
         }
 
-        [HttpGet("id:int")]
+        [HttpGet("id")]
         
         // GET: api/Films/5
         
@@ -65,35 +65,71 @@ namespace Film_Management_System_API.Controller
         [HttpGet("movieid")]
         public IActionResult GetFilmByName(string movieid)
         {
-            MovieDAO movieDAO = new MovieDAO();
-            return Ok(movieDAO.GetFilmByTitle(movieid));
+
+           
+            var query = from f in _context.Films
+                        where Convert.ToString(f.Title).Equals(movieid)
+                        select f;
+            return Ok(query);
         }
-        /* [HttpGet("{Language}")]
-
-
-        /*[HttpGet("{search}")]
-        public async Task<ActionResult<IEnumerable<Film>>> Search(string name, Film? fil)
-
+        [HttpGet("rate")]
+        public IActionResult GetFilmByRating(int rate)
         {
-            try
-            {
-                var result = await movieRepository.Search(name, fil);
 
-                if (result.Any())
-                {
-                    return Ok(result);
-                }
 
-                return NotFound();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database");
-            }
-        }*/
+            var query = from f in _context.Films
+                        where f.Rating.Equals(rate)
+                        select f;
+                return Ok(query);
+        }
+        [HttpGet("Actor")]
+        public IActionResult GetFilmByActor(string Actor)
+        {
 
-        // PUT: api/Films/5
+
+            var query = from f in _context.Films
+                        join n in _context.Actors on f.ActorId equals n.ActorId
+                        where Convert.ToString(n.FirstName).Equals(Actor)
+                        select new
+                        {
+                            f.Title,
+                            f.ReleaseYear,
+                            f.Rating
+                        };
+            return Ok(query);
+        }
+        [HttpGet("Language")]
+        public IActionResult GetFilmByLanguage(string Language)
+        {
+
+
+            var query = from f in _context.Films
+                        join n in _context.Languages on f.LanguageId equals n.LanguageId
+                        where Convert.ToString(n.Name).Equals(Language)
+                        select new
+                        {
+                            f.Title,
+                            f.ReleaseYear,
+                            f.Rating
+                        };
+            return Ok(query);
+        }
+        [HttpGet("Category")]
+        public IActionResult GetFilmByCategory(string Category)
+        {
+
+
+            var query = from f in _context.Films
+                        join n in _context.Categories on f.CategoryId equals n.CategoryId
+                        where Convert.ToString(n.Name).Equals(Category)
+                        select new
+                        {
+                            f.Title,
+                            f.ReleaseYear,
+                            f.Rating
+                        };
+            return Ok(query);
+        }
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 
         [HttpPut("{id}")]

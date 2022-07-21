@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Film_Management_System_API.Models;
+using Film_Management_System_API.DataModels.Film;
+using AutoMapper;
 
 namespace Film_Management_System_API.Controller
 {
@@ -14,10 +16,12 @@ namespace Film_Management_System_API.Controller
     public class ActorsController : ControllerBase
     {
         private readonly MoviesContext _context;
+        private readonly IMapper mapper;
 
-        public ActorsController(MoviesContext context)
+        public ActorsController(MoviesContext context, IMapper mapper)
         {
             _context = context;
+            this.mapper = mapper;
         }
 
         // GET: api/Actors
@@ -83,16 +87,14 @@ namespace Film_Management_System_API.Controller
         // POST: api/Actors
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Actor>> PostActor(Actor actor)
+        public async Task<ActionResult<ActorDTO>> PostActor(ActorDTO actor)
         {
-          if (_context.Actors == null)
-          {
-              return Problem("Entity set 'MoviesContext.Actors'  is null.");
-          }
-            _context.Actors.Add(actor);
+            Actor f = mapper.Map<Actor>(actor);
+            await _context.Actors.AddAsync(f);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetActor", new { id = actor.ActorId }, actor);
+
+            return CreatedAtAction("GetActor", new { id = f.ActorId }, f);
         }
 
         // DELETE: api/Actors/5
