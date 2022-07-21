@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Film_Management_System_API.Models;
+using AutoMapper;
+using Film_Management_System_API.DataModels.Film;
 
 namespace Film_Management_System_API.Controller
 {
@@ -14,10 +16,12 @@ namespace Film_Management_System_API.Controller
     public class LanguagesController : ControllerBase
     {
         private readonly MoviesContext _context;
+        private readonly IMapper mapper;
 
-        public LanguagesController(MoviesContext context)
+        public LanguagesController(MoviesContext context, IMapper mapper)
         {
             _context = context;
+            this.mapper = mapper;
         }
 
         // GET: api/Languages
@@ -48,20 +52,7 @@ namespace Film_Management_System_API.Controller
 
             return language;
         }
-       /* [HttpGet("search")]
-        public async Task<ActionResult<Language>> GetLanguageByName([FromQuery]string Name)
-        {
-            
-            var language = new Language();
-
-            if (Name != language.Name)
-            {
-                return BadRequest();
-            }
-            return Ok(await _context.Films.ToListAsync());
-
-
-        }*/
+       
 
             // PUT: api/Languages/5
             // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -97,16 +88,12 @@ namespace Film_Management_System_API.Controller
         // POST: api/Languages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Language>> PostLanguage(Language language)
+        public async Task<ActionResult<LanguageDTO>> PostLanguage(LanguageDTO language)
         {
-          if (_context.Languages == null)
-          {
-              return Problem("Entity set 'MoviesContext.Languages'  is null.");
-          }
-            _context.Languages.Add(language);
+            var f = mapper.Map<Language>(language);
+            await _context.Languages.AddAsync(f);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetLanguage", new { id = language.LanguageId }, language);
+            return CreatedAtAction("GetLanguage", new { id = f.LanguageId }, f);
         }
 
         // DELETE: api/Languages/5

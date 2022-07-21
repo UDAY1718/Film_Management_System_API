@@ -86,7 +86,6 @@ namespace Film_Management_System_API.Controller
         public IActionResult GetFilmByActor(string Actor)
         {
 
-
             var query = from f in _context.Films
                         join n in _context.Actors on f.ActorId equals n.ActorId
                         where Convert.ToString(n.FirstName).Equals(Actor)

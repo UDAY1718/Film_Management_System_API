@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Film_Management_System_API.Models;
+using AutoMapper;
+using Film_Management_System_API.DataModels.Film;
 
 namespace Film_Management_System_API.Controller
 {
@@ -14,10 +16,12 @@ namespace Film_Management_System_API.Controller
     public class CategoriesController : ControllerBase
     {
         private readonly MoviesContext _context;
+        private readonly IMapper mapper;
 
-        public CategoriesController(MoviesContext context)
+        public CategoriesController(MoviesContext context, IMapper mapper)
         {
             _context = context;
+            this.mapper = mapper;
         }
 
         // GET: api/Categories
@@ -48,19 +52,7 @@ namespace Film_Management_System_API.Controller
 
             return category;
         }
-       /* [HttpGet("/{name}")]
-        public async Task<ActionResult<Category>> GetCategoryByName(string name)
-        {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            List<Category> lst = await _context.Categories.ToListAsync();
-
-           
-
-            return Ok(lst);
-        }*/
+      
 
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -96,16 +88,14 @@ namespace Film_Management_System_API.Controller
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<CategoryDTO>> PostCategory(CategoryDTO category)
         {
-          if (_context.Categories == null)
-          {
-              return Problem("Entity set 'MoviesContext.Categories'  is null.");
-          }
-            _context.Categories.Add(category);
+            var f = mapper.Map<Category>(category);
+            await _context.Categories.AddAsync(f);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
+            return CreatedAtAction("GetCategory", new { id = f.CategoryId }, f);
+
         }
 
         // DELETE: api/Categories/5
