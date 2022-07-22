@@ -14,10 +14,12 @@ namespace Film_Management_System_API.Controller
     public class AdminsController : ControllerBase
     {
         private readonly MoviesContext _context;
+        private readonly IJwtAuthenticationManager jwtAuthenticationManager;
 
-        public AdminsController(MoviesContext context)
+        public AdminsController(MoviesContext context, IJwtAuthenticationManager jwtAuthenticationManager)
         {
             _context = context;
+            this.jwtAuthenticationManager = jwtAuthenticationManager;
         }
 
         // GET: api/Admins
@@ -107,6 +109,14 @@ namespace Film_Management_System_API.Controller
             }
 
             return CreatedAtAction("GetAdmin", new { id = admin.AdminId }, admin);
+        }
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody]Admin admin)
+        {
+            var token =jwtAuthenticationManager.Authenticate(admin.AdminUsername, admin.AdminPassword);
+            if(token == null)
+                return Unauthorized();
+            return Ok(token);
         }
 
         // DELETE: api/Admins/5

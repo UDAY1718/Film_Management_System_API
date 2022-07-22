@@ -1,3 +1,4 @@
+using Film_Management_System_API;
 using Film_Management_System_API.Configuration;
 using Film_Management_System_API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,8 @@ var builder =  WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+var key = "This is my test key";
+builder.Services.AddSingleton<IJwtAuthenticationManager>(new JwtAuthenticationManager(key));
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddDbContext<MoviesContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -20,6 +23,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
+
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
