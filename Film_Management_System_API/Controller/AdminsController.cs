@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Film_Management_System_API.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Film_Management_System_API.Controller
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminsController : ControllerBase
@@ -110,12 +112,16 @@ namespace Film_Management_System_API.Controller
 
             return CreatedAtAction("GetAdmin", new { id = admin.AdminId }, admin);
         }
+        [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]Admin admin)
         {
+      
             var token =jwtAuthenticationManager.Authenticate(admin.AdminUsername, admin.AdminPassword);
-            if(token == null)
+            if (token == null)
+            {
                 return Unauthorized();
+            }
             return Ok(token);
         }
 

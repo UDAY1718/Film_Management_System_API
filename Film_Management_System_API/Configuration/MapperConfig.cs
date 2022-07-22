@@ -14,6 +14,7 @@ namespace Film_Management_System_API.Configuration
             CreateMap<ActorDTO, Actor>().ReverseMap();
             CreateMap<CategoryDTO, Category>().ReverseMap();
             CreateMap<LanguageDTO, Language>().ReverseMap();    
+            CreateMap<AdminDTO, Admin>().ReverseMap();
         }
     }
 }

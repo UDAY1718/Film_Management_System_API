@@ -20,21 +20,22 @@ namespace Film_Management_System_API
             {
                 return null;
             }
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenkey = Encoding.ASCII.GetBytes(key);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, AdminUsername)
-                }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenkey),
-                SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-
+          
+             var tokenHandler = new JwtSecurityTokenHandler();
+             var tokenkey = Encoding.ASCII.GetBytes(key);
+             var tokenDescriptor = new SecurityTokenDescriptor
+             {
+                 Subject = new ClaimsIdentity(new Claim[]
+                 {
+                     new Claim(ClaimTypes.Name, AdminUsername)
+                 }),
+                 Expires = DateTime.UtcNow.AddHours(1),
+                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenkey),
+                 SecurityAlgorithms.HmacSha256Signature)
+             };
+             var token = tokenHandler.CreateToken(tokenDescriptor);
+             return tokenHandler.WriteToken(token);
+ 
         }
     }
 }
