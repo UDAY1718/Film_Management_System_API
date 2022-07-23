@@ -17,17 +17,16 @@ namespace Film_Management_System_API.Controller
     [ApiController]
     public class FilmsController : ControllerBase
     {
-        private readonly IMapper mapper;
-
+       private readonly IMapper _mapper;
         private readonly MoviesContext _context;
-
+        IList<Film> fil = new List<Film>();
         public FilmsController(MoviesContext context, IMapper mapper)
         {
             _context = context;
-            this.mapper = mapper;
+            _mapper = mapper;
         }
 
-     
+
 
         // GET: api/Films
 
@@ -42,10 +41,10 @@ namespace Film_Management_System_API.Controller
         }
 
         [HttpGet("id")]
-        
+
         // GET: api/Films/5
-        
-        
+
+
         public IActionResult GetFilm(decimal id)
         {
             if (_context.Films == null)
@@ -62,18 +61,21 @@ namespace Film_Management_System_API.Controller
             return Ok(film);
         }
 
-        
-        [HttpGet("movieid")]
-        public IActionResult GetFilmByName(string movieid)
+
+        [HttpPost("Name")]
+        public IActionResult SearchByName(string Name)
         {
+
+
             var query = from f in _context.Films
-                        where Convert.ToString(f.Title).Equals(movieid)
-                        select new { f.Title,
-                        f.ReleaseYear,
-                        f.Rating
+                        where (Convert.ToString(f.Title)).Equals(Name)
+                        select new { Title = f.Title,
+                        ReleaseYear = f.ReleaseYear,
+                        Rating = f.Rating
 
             };
-            return Ok(query);
+            //List<FilmDTO> d = query.ToList();
+            return Ok(query.FirstOrDefault());
         }
         [HttpGet("rate")]
         public IActionResult GetFilmByRating(int rate)
@@ -169,11 +171,11 @@ namespace Film_Management_System_API.Controller
        
         [HttpPost]
     
-        public async Task<ActionResult<FilmDTO>> PostFilm(FilmDTO film)
+        public async Task<ActionResult<Film>> PostFilm(Film film)
         {
            
             
-            var f = mapper.Map<Film>(film);
+           var f = _mapper.Map<Film>(film);
             await _context.Films.AddAsync(f);
             await _context.SaveChangesAsync();
 

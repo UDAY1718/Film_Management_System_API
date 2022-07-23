@@ -8,17 +8,23 @@ using Microsoft.EntityFrameworkCore;
 using Film_Management_System_API;
 using Film_Management_System_API.Models;
 using AutoMapper;
+using System.IO;
+using System.Configuration;
+using Newtonsoft.Json;
+using Film_Management_System_API.DataModels;
 
 namespace Film_Management_System_MVC.Controllers
 {
     public class FilmsController : Controller
     {
         private readonly MoviesContext _context;
-        private readonly IMapper mapper;
-        public FilmsController(MoviesContext context)
+        private static string _name;
+        private IConfiguration configuration;
+       
+        public FilmsController(MoviesContext context, IConfiguration configuration)
         {
             _context = context;
-            
+            this.configuration = configuration;
         }
 
         // GET: Films
@@ -31,39 +37,82 @@ namespace Film_Management_System_MVC.Controllers
         // GET: Films/Details/5
         public async Task<IActionResult> Details(decimal? id)
         {
-            if (id == null || _context.Films == null)
-            {
-                return NotFound();
-            }
+           
+            
 
-            var film = await _context.Films
-                .Include(f => f.Actor)
-                .Include(f => f.Category)
-                .Include(f => f.Language)
-                .Include(f => f.OriginalLanguage)
-                .FirstOrDefaultAsync(m => m.FilmId == id);
-            if (film == null)
-            {
-                return NotFound();
-            }
+             if (id == null || _context.Films == null)
+             {
+                 return NotFound();
+             }
 
-            return View(film);
+             var film = await _context.Films
+                 .Include(f => f.Actor)
+                 .Include(f => f.Category)
+                 .Include(f => f.Language)
+                 .Include(f => f.OriginalLanguage)
+                 .FirstOrDefaultAsync(m => m.FilmId == id);
+             if (film == null)
+             {
+                 return NotFound();
+             }
+
+             return View(film);
         }
-        [HttpGet]
-        public async Task<IActionResult> SearchByName(string name)
-        {
-            var query = from f in _context.Films
-                        where Convert.ToString(f.Title).Equals(name)
-                        select new
-                        {
-                            f.Title,
-                            f.ReleaseYear,
-                            f.Rating
 
-                        };
-            return Ok(query);
-        }
+        public IActionResult SearchByName()
         
+        {
+            Film f = new Film();
+            return View();
+        }
+
+        [HttpPost]
+               [ValidateAntiForgeryToken]
+               public async Task<IActionResult> SearchByName(IFormCollection collection)
+
+               {
+                   string name = collection["Title"];
+                   var model = await this.SendDataToApi<string, Film>(
+                      baseUri: configuration.GetConnectionString("FilmsUri"),
+                      requestUrl: "api/Films/Name/",name
+
+                      );
+                   var credstring = JsonConvert.SerializeObject(model);
+                   TempData["cred"] = credstring;
+                   return RedirectToAction("ViewMovie", "Films");
+
+
+
+               }
+       /* [HttpPost]
+        public ActionResult SearchByName(string name)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("http://localhost:5076/api/Films/Name");
+
+                //HTTP POST
+                var postTask = client.PostAsJsonAsync<Film>("student", Film);
+                postTask.Wait();
+
+                var result = postTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Server Error. Please contact administrator.");
+
+            return View();
+        }*/
+        public IActionResult ViewMovie()
+        {
+            var credstring = TempData["cred"].ToString();
+            var cred = JsonConvert.DeserializeObject<IEnumerable<Film>>(credstring);
+
+            return View(model: cred);
+        }
 
         // GET: Films/Create
         public IActionResult Create()
@@ -84,6 +133,7 @@ namespace Film_Management_System_MVC.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 _context.Add(film);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
