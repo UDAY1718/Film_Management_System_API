@@ -3,7 +3,7 @@
     public class AdminDTO
     {
 
-        public string Admin_username { get; set; }
-        public string Admin_password { get; set; }
+        public string? AdminUsernameEmail { get; set; } = String.Empty;
+        public string Admin_password { get; set; }=String.Empty;
     }
 }

@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Film_Management_System_API.Models
 {
-    public partial class Admin
+    public class Admin
     {
-        public string AdminId { get; set; } = null!;
-        public string AdminUsername { get; set; } = null!;
-        public string AdminEmail { get; set; } = null!;
-        public string AdminPassword { get; set; } = null!;
+        public int AdminId { get; set; }
+        [Required(ErrorMessage = "Username should not be empty")]
+        public string AdminUsernameEmail { get; set; }
+        [Required(ErrorMessage = "Password should not be empty")]
+        public string AdminPassword { get; set; }   
+        public byte[] AdminPasswordHash { get; set; }
+        public byte[] AdminPasswordSalt {  get; set; }
     }
 }

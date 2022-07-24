@@ -60,7 +60,7 @@ namespace Film_Management_System_API.Models
                     .HasMaxLength(50)
                     .HasColumnName("Admin_Id");
 
-                entity.Property(e => e.AdminEmail)
+                entity.Property(e => e.AdminUsernameEmail)
                     .HasMaxLength(50)
                     .HasColumnName("Admin_Email");
 
@@ -68,7 +68,7 @@ namespace Film_Management_System_API.Models
                     .HasMaxLength(50)
                     .HasColumnName("Admin_Password");
 
-                entity.Property(e => e.AdminUsername)
+                entity.Property(e => e.AdminUsernameEmail)
                     .HasMaxLength(50)
                     .HasColumnName("Admin_Username");
             });

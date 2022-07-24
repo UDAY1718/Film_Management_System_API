@@ -16,7 +16,7 @@ namespace Film_Management_System_API
         public string Authenticate(string AdminUsername, string AdminPassword)
         {
              Admin a = new Admin();
-            if(!(a.AdminUsername == AdminUsername&& a.AdminPassword == AdminPassword))
+            if(!(a.AdminUsernameEmail == AdminUsername&& a.AdminPassword == AdminPassword))
             {
                 return null;
             }

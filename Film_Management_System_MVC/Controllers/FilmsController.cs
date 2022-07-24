@@ -33,13 +33,32 @@ namespace Film_Management_System_MVC.Controllers
             var moviesContext = _context.Films.Include(f => f.Actor).Include(f => f.Category).Include(f => f.Language).Include(f => f.OriginalLanguage);
             return View(await moviesContext.ToListAsync());
         }
+        [HttpGet]
+        public async Task<IActionResult> Search(string name)
+        {
+            if ( name == null || _context.Films == null)
+            {
+                return NotFound();
+            }
+
+            var film = await _context.Films
+                .Include(f => f.Actor)
+                .Include(f => f.Category)
+                .Include(f => f.Language)
+                .Include(f => f.OriginalLanguage)
+                .FirstOrDefaultAsync(m => m.Title == name);
+            if (film == null)
+            {
+                return NotFound();
+            }
+
+            return View(film);
+        }
 
         // GET: Films/Details/5
         public async Task<IActionResult> Details(decimal? id)
         {
            
-            
-
              if (id == null || _context.Films == null)
              {
                  return NotFound();
@@ -59,14 +78,14 @@ namespace Film_Management_System_MVC.Controllers
              return View(film);
         }
 
-        public IActionResult SearchByName()
+/*        public IActionResult SearchByName()
         
         {
             Film f = new Film();
             return View();
-        }
+        }*/
 
-        [HttpPost]
+     /*   [HttpPost, ActionName("SearchByName")]
                [ValidateAntiForgeryToken]
                public async Task<IActionResult> SearchByName(IFormCollection collection)
 
@@ -74,16 +93,13 @@ namespace Film_Management_System_MVC.Controllers
                    string name = collection["Title"];
                    var model = await this.SendDataToApi<string, Film>(
                       baseUri: configuration.GetConnectionString("FilmsUri"),
-                      requestUrl: "api/Films/Name/",name
-
+                      requestUrl: "api/Films/SearchByName/",name
                       );
                    var credstring = JsonConvert.SerializeObject(model);
                    TempData["cred"] = credstring;
                    return RedirectToAction("ViewMovie", "Films");
 
-
-
-               }
+               }*/
        /* [HttpPost]
         public ActionResult SearchByName(string name)
         {
@@ -128,7 +144,7 @@ namespace Film_Management_System_MVC.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
+       
         public async Task<IActionResult> Create([Bind("FilmId,Description,Title,LanguageId,OriginalLanguageId,Length,ReplacementCost,Rating,SpecialFeatures,ActorId,CategoryId,ReleaseYear,RentalDuration")] Film film)
         {
             if (ModelState.IsValid)
@@ -169,7 +185,7 @@ namespace Film_Management_System_MVC.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
+      
         public async Task<IActionResult> Edit(decimal id, [Bind("FilmId,Description,Title,LanguageId,OriginalLanguageId,Length,ReplacementCost,Rating,SpecialFeatures,ActorId,CategoryId,ReleaseYear,RentalDuration")] Film film)
         {
             if (id != film.FilmId)

@@ -58,7 +58,7 @@ namespace Film_Management_System_API.Controller
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAdmin(string id, Admin admin)
         {
-            if (id != admin.AdminId)
+            if (!(id.Equals(admin.AdminId)))
             {
                 return BadRequest();
             }
@@ -100,7 +100,7 @@ namespace Film_Management_System_API.Controller
             }
             catch (DbUpdateException)
             {
-                if (AdminExists(admin.AdminId))
+                if (AdminExists(admin.AdminId.ToString()))
                 {
                     return Conflict();
                 }
@@ -117,7 +117,7 @@ namespace Film_Management_System_API.Controller
         public IActionResult Authenticate([FromBody]Admin admin)
         {
       
-            var token =jwtAuthenticationManager.Authenticate(admin.AdminUsername, admin.AdminPassword);
+            var token =jwtAuthenticationManager.Authenticate(admin.AdminUsernameEmail, admin.AdminPassword);
             if (token == null)
             {
                 return Unauthorized();
@@ -147,7 +147,7 @@ namespace Film_Management_System_API.Controller
 
         private bool AdminExists(string id)
         {
-            return (_context.Admins?.Any(e => e.AdminId == id)).GetValueOrDefault();
+            return (_context.Admins?.Any(e => e.AdminId.Equals(id))).GetValueOrDefault();
         }
     }
 }
