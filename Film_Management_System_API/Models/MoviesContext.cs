@@ -28,7 +28,7 @@ namespace Film_Management_System_API.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=LAPTOP-IGR1158J\\SQLEXPRESS;Initial Catalog=Movies;Integrated Security=True;");
+                optionsBuilder.UseSqlServer("Data Source=LAPTOP-IGR1158J\\SQLEXPRESS;Initial Catalog=Movies;Integrated Security=True");
             }
         }
 
@@ -56,21 +56,15 @@ namespace Film_Management_System_API.Models
             {
                 entity.ToTable("Admin");
 
-                entity.Property(e => e.AdminId)
-                    .HasMaxLength(50)
-                    .HasColumnName("Admin_Id");
-
-                entity.Property(e => e.AdminUsernameEmail)
-                    .HasMaxLength(50)
-                    .HasColumnName("Admin_Email");
+                entity.Property(e => e.AdminId).HasColumnName("AdminID");
 
                 entity.Property(e => e.AdminPassword)
                     .HasMaxLength(50)
-                    .HasColumnName("Admin_Password");
+                    .IsUnicode(false);
 
                 entity.Property(e => e.AdminUsernameEmail)
                     .HasMaxLength(50)
-                    .HasColumnName("Admin_Username");
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Category>(entity =>

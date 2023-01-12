@@ -4,6 +4,6 @@
     {
 
         public string? AdminUsernameEmail { get; set; } = String.Empty;
-        public string Admin_password { get; set; }=String.Empty;
+        public string? AdminPassword { get; set; }=String.Empty;
     }
 }

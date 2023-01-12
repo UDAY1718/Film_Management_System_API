@@ -9,12 +9,14 @@ using Film_Management_System_API.Models;
 using Film_Management_System_API.Infrastructure;
 using Film_Management_System_API.DataModels;
 using AutoMapper;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace Film_Management_System_API.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+
+   [Authorize]
     public class FilmsController : ControllerBase
     {
        private readonly IMapper _mapper;

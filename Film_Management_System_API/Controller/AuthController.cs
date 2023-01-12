@@ -30,36 +30,83 @@ namespace Film_Management_System_API.Controller
         {
             var user = mapper.Map<Admin>(request);
             await _moviesContext.Admins.AddAsync(user);
-            await _moviesContext.SaveChangesAsync();
-            CreatePasswordHash(request.Admin_password,out byte[] passwordHash,out byte[] passwordSalt);
+          
+            
             admin.AdminUsernameEmail = request.AdminUsernameEmail;
-            admin.AdminPassword = request.Admin_password;
-            admin.AdminPasswordHash = passwordHash;
-            admin.AdminPasswordSalt = passwordSalt;
+            admin.AdminPassword = request.AdminPassword;
 
+            await _moviesContext.SaveChangesAsync();
             return Ok(admin);
         }
 
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(AdminDTO request)
         {
-            if (admin.AdminUsernameEmail != request.AdminUsernameEmail)
+            if (admin.AdminUsernameEmail != request.AdminUsernameEmail && admin.AdminPassword!=admin.AdminPassword)
             {
                 return BadRequest("Admin not found.");
             }
-            if (!VerifyPasswordHash(request.Admin_password, admin.AdminPasswordHash, admin.AdminPasswordSalt))
+           
+            string token = CreateToken(request);
+            Token t = new Token();
+            t.token = token;
+            var refreshToken = GenerateRefreshToken();
+            SetRefreshToken(refreshToken);
+            return Ok(t);
+        }
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<string>> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (!admin.RefreshToken.Equals(refreshToken))
             {
-                return BadRequest("Wrong Password");
+                return Unauthorized("Invalid Refresh Token.");
             }
-            string token = CreateToken(admin);
+            else if (admin.TokenExpires < DateTime.Now)
+            {
+                return Unauthorized("Token expired.");
+            }
+            AdminDTO ad     = new AdminDTO();
+            string token = CreateToken(ad);
+            var newRefreshToken = GenerateRefreshToken();
+            SetRefreshToken(newRefreshToken);
+
             return Ok(token);
         }
 
-        private string CreateToken(Admin admin)
+        private RefreshToken GenerateRefreshToken()
         {
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.Now.AddDays(7),
+                Created = DateTime.Now
+            };
+
+            return refreshToken;
+        }
+
+        private void SetRefreshToken(RefreshToken newRefreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = newRefreshToken.Expires
+            };
+            Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+
+            admin.RefreshToken = newRefreshToken.Token;
+            admin.TokenCreated = newRefreshToken.Created;
+            admin.TokenExpires = newRefreshToken.Expires;
+        }
+
+        private string CreateToken(AdminDTO request)
+        {
+
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name,admin.AdminUsernameEmail)
+                new Claim(ClaimTypes.Name,request.AdminUsernameEmail)
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -70,7 +117,7 @@ namespace Film_Management_System_API.Controller
             var jwt=new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
         }
-        private void CreatePasswordHash(string password,out byte[] passwordHash, out byte[] passwordSalt)
+       /* private void CreatePasswordHash(string password,out byte[] passwordHash, out byte[] passwordSalt)
         {
             using(var hmac=new HMACSHA512())
             {
@@ -79,14 +126,14 @@ namespace Film_Management_System_API.Controller
 
             }
         }
-
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+*/
+       /* private bool VerifyPasswordHash(string password)
         {
             using (var hmac = new HMACSHA512(admin.AdminPasswordSalt))
             {
                 var computedHash=hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
-        }
+        }*/
     }
 }
